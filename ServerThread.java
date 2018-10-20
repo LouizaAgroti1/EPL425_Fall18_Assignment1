@@ -1,8 +1,8 @@
-package Labs.reverse_server_multi_threaded;
-
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Timer;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -27,6 +27,8 @@ public class ServerThread extends Thread {
 	public void run() {
 		int max_requests = 300;
 		try {
+			long startTime = System.nanoTime();
+			int requests=0;
 			for (int i = 1; i <= max_requests; i++) {
 				InputStream input = socket.getInputStream();
 				BufferedReader reader = new BufferedReader(new InputStreamReader(input));
@@ -34,17 +36,24 @@ public class ServerThread extends Thread {
 				OutputStream output = socket.getOutputStream();
 				PrintWriter writer = new PrintWriter(output, true);
 				String request_msg = reader.readLine();
+
 				System.out.println(request_msg);
 				String request_userid = reader.readLine();
 				System.out.println(request_userid);
 				String socket_address = reader.readLine();
 				System.out.println("socket address " + socket_address);
-
 				String response = "WELCOME";
-				writer.println(response + " " + request_userid);
 
+				writer.println(response + " " + request_userid);
 				byte payload[] = get_payload();
 				writer.println(payload);
+				long elapsedTime = System.nanoTime()-startTime;
+				if(elapsedTime<=1000000000){
+					requests++;
+				}else{
+					requests=0;
+					startTime = System.nanoTime();
+				}
 			}
 			socket.close();
 		} catch (IOException ex) {
@@ -52,5 +61,4 @@ public class ServerThread extends Thread {
 			ex.printStackTrace();
 		}
 	}
-
 }

@@ -1,7 +1,6 @@
-package Labs.reverse_server_multi_threaded;
-
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 /**
  * This program demonstrates a simple TCP/IP socket server that echoes every
@@ -9,6 +8,9 @@ import java.net.*;
  */
 public class Server {
 
+	//public static ArrayList<Integer> requests=new ArrayList<Integer>();
+	public static int requests=0;
+	
 	public static void main(String[] args) {
 		if (args.length < 1)
 			return;
@@ -18,7 +20,8 @@ public class Server {
 		try (ServerSocket serverSocket = new ServerSocket(port)) {
 
 			System.out.println("Server is listening on port " + port);
-
+			
+			
 			while (true) {
 				Socket socket = serverSocket.accept();
 				System.out.println("New client connected");
