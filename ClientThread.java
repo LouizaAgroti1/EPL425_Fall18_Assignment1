@@ -1,5 +1,3 @@
-package Labs.reverse_server_multi_threaded;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -19,13 +17,15 @@ public class ClientThread extends Thread {
 
 	private Socket socket;
 	private int user_id;
-	private double avg_RTT;
+	private double RTT;
 	private int N;
+	private int repet;
 
-	public ClientThread(Socket socket, int user_id,int N) {
+	public ClientThread(Socket socket, int user_id,int N,int repet) {
 		this.socket = socket;
 		this.user_id = user_id;
 		this.N=N;
+		this.repet=repet;
 	}
 	
 	public void write_RTT(double RTT,int N) {
@@ -80,21 +80,33 @@ public class ClientThread extends Thread {
 				long RTT=System.nanoTime()-startTime;
 				sumRTT+=RTT;
 			}
-			avg_RTT=sumRTT/max_requests;
-			Client.RTT.add(avg_RTT);
+			RTT=sumRTT;
+			Client.RTT.add(RTT);
 			socket.close();
 		} catch (IOException ex) {
 			System.out.println("Client exception: " + ex.getMessage());
 			ex.printStackTrace();
 		}
+		
 		if(Client.RTT.size()==N){
 			long sum=0;
 		for(int i=0;i<Client.RTT.size();i++){
 			sum+=Client.RTT.get(i);
 		}
 		double avg=sum/N;
-		write_RTT(avg,N);
+		Client.repetitions.add(avg);
 		Client.RTT.clear();
 		}
+		
+		if(Client.repetitions.size()==repet){
+			long sumRep=0;
+			for(int i=0;i<Client.repetitions.size();i++){
+				sumRep+=Client.repetitions.get(i);
+			}
+			double avgRep=sumRep/repet;
+			write_RTT(avgRep,N);
+			Client.repetitions.clear();
+		}
+		
 	}
 }

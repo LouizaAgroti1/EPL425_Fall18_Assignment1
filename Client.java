@@ -1,5 +1,3 @@
-package Labs.reverse_server_multi_threaded;
-
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -12,26 +10,28 @@ import java.io.*;
 public class Client {
 
 	public static ArrayList<Double> RTT = new ArrayList<Double>();
-
+	public static ArrayList<Double> repetitions = new ArrayList<Double>();
+	
 	public static void main(String[] args) {
 		if (args.length < 2)
 			return;
 
 		String hostname = args[0];
 		int port = Integer.parseInt(args[1]);
-		int repetitions = Integer.parseInt(args[2]);
+		int repet = Integer.parseInt(args[2]);
 
 		try {
-			int N = 10;
-			for (int i = 1; i <= repetitions; i++) {
-				int user_id = 1;
-				while (user_id <= N) {
-					Socket socket = new Socket(hostname, port);
-					ClientThread clientThread = new ClientThread(socket, user_id, N);
-					clientThread.start();
-					user_id++;
+			int N = 40;
+			for (int j = 10; j <= N; j += 10) {
+				for (int i = 1; i <= repet; i++) {
+					int user_id = 1;
+					while (user_id <= j) {
+						Socket socket = new Socket(hostname, port);
+						ClientThread clientThread = new ClientThread(socket, user_id, j,repet);
+						clientThread.start();
+						user_id++;
+					}
 				}
-				N++;
 			}
 		} catch (UnknownHostException ex) {
 
