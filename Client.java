@@ -11,6 +11,7 @@ public class Client {
 
 	public static ArrayList<Double> RTT = new ArrayList<Double>();
 	public static ArrayList<Double> repetitions = new ArrayList<Double>();
+	public static ArrayList<Double> throughput_user = new ArrayList<Double>();
 	
 	public static void main(String[] args) {
 		if (args.length < 2)
@@ -21,15 +22,24 @@ public class Client {
 		int repet = Integer.parseInt(args[2]);
 
 		try {
-			int N = 40;
+			int N = 110;
 			for (int j = 10; j <= N; j += 10) {
+				ArrayList<ClientThread> threads = new ArrayList<ClientThread>();
 				for (int i = 1; i <= repet; i++) {
 					int user_id = 1;
 					while (user_id <= j) {
 						Socket socket = new Socket(hostname, port);
 						ClientThread clientThread = new ClientThread(socket, user_id, j,repet);
 						clientThread.start();
+						threads.add(clientThread);
 						user_id++;
+					}
+					for(int k=0;k<threads.size();k++){
+						try {
+							threads.get(k).join();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}

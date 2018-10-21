@@ -62,6 +62,8 @@ public class ClientThread extends Thread {
 	public void run() {
 		int max_requests = 300;
 		long sumRTT=0;
+		double avg_throughput_user=0.0;
+		
 		try {
 			String socket_address = socket.getRemoteSocketAddress().toString();
 			for (int i = 1; i <= max_requests; i++) {
@@ -79,6 +81,9 @@ public class ClientThread extends Thread {
 				byte[] payload = reader.readLine().getBytes();
 				long RTT=System.nanoTime()-startTime;
 				sumRTT+=RTT;
+				if(i==max_requests){
+					avg_throughput_user=Double.parseDouble(reader.readLine());
+				}
 			}
 			RTT=sumRTT;
 			Client.RTT.add(RTT);
