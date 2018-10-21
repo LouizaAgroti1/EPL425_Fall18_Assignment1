@@ -12,6 +12,7 @@ public class Client {
 	public static ArrayList<Double> RTT = new ArrayList<Double>();
 	public static ArrayList<Double> repetitions = new ArrayList<Double>();
 	public static ArrayList<Double> throughput_user = new ArrayList<Double>();
+	public static ArrayList<Double> throughput_repetitions = new ArrayList<Double>();
 	
 	public static void main(String[] args) {
 		if (args.length < 2)
@@ -26,6 +27,7 @@ public class Client {
 			for (int j = 10; j <= N; j += 10) {
 				ArrayList<ClientThread> threads = new ArrayList<ClientThread>();
 				for (int i = 1; i <= repet; i++) {
+					//long beforeUsedMem=Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 					int user_id = 1;
 					while (user_id <= j) {
 						Socket socket = new Socket(hostname, port);
@@ -41,6 +43,9 @@ public class Client {
 							e.printStackTrace();
 						}
 					}
+					//long afterUsedMem=Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+					//long actualMemUsed=afterUsedMem-beforeUsedMem;
+					//System.out.println(actualMemUsed);
 				}
 			}
 		} catch (UnknownHostException ex) {

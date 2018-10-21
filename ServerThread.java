@@ -50,13 +50,13 @@ public class ServerThread extends Thread {
 				writer.println(payload);
 				long elapsedTime = System.nanoTime()-startTime;
 				
-				if(elapsedTime>1000000000){
+				if(elapsedTime>1000000){
 					count_sec++;
 					startTime = System.nanoTime();
 				}
 				
 				if(i==max_requests){
-					double avg_throughput_user=max_requests/count_sec;
+					double avg_throughput_user= ((double)max_requests)/((double) count_sec);
 					writer.println(avg_throughput_user);
 				}
 			}
