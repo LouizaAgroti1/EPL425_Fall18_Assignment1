@@ -7,9 +7,6 @@ import java.util.ArrayList;
  * message from the client in reversed form. This server is multi-threaded.
  */
 public class Server {
-
-	//public static ArrayList<Integer> requests=new ArrayList<Integer>();
-	public static int requests=0;
 	
 	public static void main(String[] args) {
 		if (args.length < 1)

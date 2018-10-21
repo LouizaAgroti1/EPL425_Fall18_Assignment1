@@ -29,6 +29,7 @@ public class ServerThread extends Thread {
 		try {
 			long startTime = System.nanoTime();
 			int requests=0;
+			int count_sec=0;
 			for (int i = 1; i <= max_requests; i++) {
 				InputStream input = socket.getInputStream();
 				BufferedReader reader = new BufferedReader(new InputStreamReader(input));
@@ -48,13 +49,18 @@ public class ServerThread extends Thread {
 				byte payload[] = get_payload();
 				writer.println(payload);
 				long elapsedTime = System.nanoTime()-startTime;
-				if(elapsedTime<=1000000000){
-					requests++;
-				}else{
-					requests=0;
+				
+				if(elapsedTime>1000000000){
+					count_sec++;
 					startTime = System.nanoTime();
 				}
+				
+				if(i==max_requests){
+					double avg_throughput_user=max_requests/count_sec;
+					writer.println(avg_throughput_user);
+				}
 			}
+			
 			socket.close();
 		} catch (IOException ex) {
 			System.out.println("Server exception: " + ex.getMessage());
