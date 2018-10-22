@@ -7,7 +7,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 
-
 /**
  * This thread is responsible to handle client connection.
  */
@@ -27,12 +26,44 @@ public class ServerThread extends Thread {
 		return payload;
 	}
 
+	public void write_file(double value, double throughput, String filename) {
+		BufferedWriter bw = null;
+		FileWriter fw = null;
+		try {
+			File file = new File(filename);
+
+			// it creates the file if the file is not already present
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+
+			// appends to the file
+			fw = new FileWriter(file, true);
+			bw = new BufferedWriter(fw);
+			bw.write(throughput + "\t" + value + "\n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (bw != null)
+					bw.close();
+				if (fw != null)
+					fw.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+
+			}
+		}
+
+	}
+
 	public void run() {
 		int max_requests = 300;
+		double avg_throughput_user = 0.0;
 		try {
 			long startTime = System.nanoTime();
-			int requests=0;
-			int count_sec=0;
+			int requests = 0;
+			int count_sec = 0;
 			for (int i = 1; i <= max_requests; i++) {
 				InputStream input = socket.getInputStream();
 				BufferedReader reader = new BufferedReader(new InputStreamReader(input));
@@ -51,22 +82,24 @@ public class ServerThread extends Thread {
 				writer.println(response + " " + request_userid);
 				byte payload[] = get_payload();
 				writer.println(payload);
-				long elapsedTime = System.nanoTime()-startTime;
-				
-				if(elapsedTime>1000000){
+				long elapsedTime = System.nanoTime() - startTime;
+
+				if (elapsedTime > 1000000) {
 					count_sec++;
 					startTime = System.nanoTime();
 				}
-				
-				if(i==max_requests){
-					double avg_throughput_user= ((double)max_requests)/((double) count_sec);
+
+				if (i == max_requests) {
+					avg_throughput_user = ((double) max_requests) / ((double) count_sec);
 					writer.println(avg_throughput_user);
 				}
 			}
-		       OperatingSystemMXBean operatingSystemMXBean = 
-		    	          (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-		    	       System.out.println("Load "+operatingSystemMXBean.getSystemLoadAverage());
-			
+			OperatingSystemMXBean operatingSystemMXBean = (OperatingSystemMXBean) ManagementFactory
+					.getOperatingSystemMXBean();
+			write_file(operatingSystemMXBean.getSystemLoadAverage(), avg_throughput_user, "CPU_Load.txt");
+			write_file(((double) Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024,
+					avg_throughput_user, "Memory_Utilization.txt");
+
 			socket.close();
 		} catch (IOException ex) {
 			System.out.println("Server exception: " + ex.getMessage());
