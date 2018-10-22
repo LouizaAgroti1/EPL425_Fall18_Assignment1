@@ -17,7 +17,6 @@ public class ClientThread extends Thread {
 
 	private Socket socket;
 	private int user_id;
-	private double RTT;
 	private int N;
 	private int repet;
 
@@ -58,12 +57,45 @@ public class ClientThread extends Thread {
 		}
 
 	}
+	
+	public void write_RTT_array(double RTT [], int N, String filename) {
+		BufferedWriter bw = null;
+		FileWriter fw = null;
+		try {
+			File file = new File(filename);
 
+			// it creates the file if the file is not already present
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+
+			// appends to the file
+			fw = new FileWriter(file, true);
+			bw = new BufferedWriter(fw);
+			for(int i=0;i<RTT.length;i++){
+				bw.write(RTT[i] + " " + (i+1) + "\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (bw != null)
+					bw.close();
+				if (fw != null)
+					fw.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+
+			}
+		}
+
+	}
+	
 	public void run() {
 		int max_requests = 300;
 		long sumRTT = 0;
 		double avg_throughput_user = 0.0;
-
+		
 		try {
 			String socket_address = socket.getRemoteSocketAddress().toString();
 			for (int i = 1; i <= max_requests; i++) {
@@ -83,57 +115,54 @@ public class ClientThread extends Thread {
 				sumRTT += RTT;
 				if (i == max_requests) {
 					avg_throughput_user = Double.parseDouble(reader.readLine());
-					Client.throughput_user.add(avg_throughput_user);
+					Client.throughput[user_id-1]=avg_throughput_user;
+					Client.count_users_throughput++;
 				}
 			}
-			RTT = sumRTT/max_requests;
-			Client.RTT.add(RTT);
+			Client.RTT[user_id-1]+=(sumRTT/max_requests);
+			Client.count_users++;
 			socket.close();
 		} catch (IOException ex) {
 			System.out.println("Client exception: " + ex.getMessage());
 			ex.printStackTrace();
 		}
 
-		if (Client.RTT.size() == N) {
-			double sum = 0.0;
-			for (int i = 0; i < Client.RTT.size(); i++) {
-				sum += Client.RTT.get(i);
-			}
-			double avg = sum / N;
-			Client.repetitions.add(avg);
-			Client.RTT.clear();
-		}
-
-		if (Client.repetitions.size() == repet) {
-			long sumRep = 0;
-			for (int i = 0; i < Client.repetitions.size(); i++) {
-				sumRep += Client.repetitions.get(i);
-			}
-			double avgRep = sumRep / repet;
-			write_RTT(avgRep, N, "RTT.txt");
-			Client.repetitions.clear();
-		}
-
-		if (Client.throughput_user.size() == N) {
-			double sum = 0.0;
-			for (int i = 0; i < Client.throughput_user.size(); i++) {
-				sum += Client.throughput_user.get(i);
-			}
-			double avg_throughput = ((double)sum) / ((double)N);
-			Client.throughput_repetitions.add(avg_throughput);
-			Client.throughput_user.clear();
+		if (Client.count_users == N) {
+			Client.repetitions++;
 		}
 		
-		if (Client.throughput_repetitions.size() == repet) {
-			double sum = 0.0;
-			for (int i = 0; i < Client.throughput_repetitions.size(); i++) {
-				sum += Client.throughput_repetitions.get(i);
-			}
-			double avg_throughput_repet = ((double) sum) / ((double) repet);
-			write_RTT(avg_throughput_repet, N, "Throughput.txt");
-			Client.throughput_repetitions.clear();
-			
+		if(Client.count_users_throughput == N){
+			Client.repet_throughput++;
 		}
 
+		if (Client.repetitions == repet) {
+			for(int i=0;i<Client.RTT.length;i++){
+				Client.RTT[i]= ((double) Client.RTT[i])/((double)repet);
+			}
+			double tmp[]=new double[N];
+			for(int i=0;i<Client.RTT.length;i++){
+				double sum=0.0;
+				for(int j=0;j<i+1;j++){
+					sum+=Client.RTT[j];
+				}
+				tmp[i]=sum;
+			}
+			write_RTT_array(tmp,N,"RTT.txt");
+		}
+		
+		if (Client.repet_throughput == repet) {
+			for(int i=0;i<Client.throughput.length;i++){
+				Client.throughput[i]= ((double) Client.throughput[i])/((double)repet);
+			}
+			double tmp_throughput[]=new double[N];
+			for(int i=0;i<Client.throughput.length;i++){
+				double sum_throughput=0.0;
+				for(int j=0;j<i+1;j++){
+					sum_throughput+=Client.throughput[j];
+				}
+				tmp_throughput[i]=sum_throughput/(i+1);
+			}
+			write_RTT_array(tmp_throughput,N,"Throughput.txt");
+		}
 	}
 }

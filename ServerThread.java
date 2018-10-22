@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Timer;
 import java.util.concurrent.ThreadLocalRandom;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
+
 
 /**
  * This thread is responsible to handle client connection.
@@ -60,6 +63,9 @@ public class ServerThread extends Thread {
 					writer.println(avg_throughput_user);
 				}
 			}
+		       OperatingSystemMXBean operatingSystemMXBean = 
+		    	          (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+		    	       System.out.println("Load "+operatingSystemMXBean.getSystemLoadAverage());
 			
 			socket.close();
 		} catch (IOException ex) {

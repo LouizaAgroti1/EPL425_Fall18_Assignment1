@@ -24,6 +24,7 @@ public class Server {
 				System.out.println("New client connected");
 				new ServerThread(socket).start();
 			}
+			
 
 		} catch (IOException ex) {
 			System.out.println("Server exception: " + ex.getMessage());
