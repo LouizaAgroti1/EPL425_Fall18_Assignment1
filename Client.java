@@ -49,7 +49,7 @@ public class Client {
 		int repet = Integer.parseInt(args[2]);
 
 		try {
-			// an array in which each created thread is saved
+			// a list in which each created thread is saved
 			ArrayList<ClientThread> threads = new ArrayList<ClientThread>();
 			
 			//
@@ -59,10 +59,17 @@ public class Client {
 				
 				count_users=0;
 				count_users_throughput=0;
+				
 				while (user_id <= N) {
+					
+					// create of a socket and bind it to port value and hostname value 
 					Socket socket = new Socket(hostname, port);
+					
+					// create a thread that simulates one user
 					ClientThread clientThread = new ClientThread(socket, user_id, N, repet);
 					clientThread.start();
+					
+					// add the current thread into a list
 					threads.add(clientThread);
 					user_id++;
 				}
