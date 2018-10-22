@@ -56,10 +56,12 @@ public class Client {
 			for (int i = 1; i <= repet; i++) {
 				// the simulated user-id
 				int user_id = 1;
-				
+		
+				// initialize variables for each repetition
 				count_users=0;
 				count_users_throughput=0;
 				
+				// repeat until all users are created
 				while (user_id <= N) {
 					
 					// create of a socket and bind it to port value and hostname value 
@@ -74,6 +76,7 @@ public class Client {
 					user_id++;
 				}
 				
+				// makes sure that every thread that was created is finished and then moves on to the next repetition 
 				for (int k = 0; k < threads.size(); k++) {
 					try {
 						threads.get(k).join();
