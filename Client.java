@@ -1,38 +1,62 @@
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Scanner;
 import java.io.*;
 
 /**
- * This program demonstrates a simple TCP/IP socket client that reads input from
- * the user and prints echoed message from the server.
+ * This program demonstrates a simple TCP/IP socket client that simulates N concurrent
+ * users that generate a series of requests towards the server.
  */
 public class Client {
 
-	/*public static ArrayList<Double> RTT = new ArrayList<Double>();
-	public static ArrayList<Double> repetitions = new ArrayList<Double>();*/
+	// maximum number of concurrent simulated users
 	public static int N = 10;
+	
+	// an array that contains the communication latency (time between sending a request and receiving the respective response (RTT)) of each user 
 	public static double RTT [] = new double [N];
+	
+	// number of repeated client-runs (to obtain more accurate results) used for computation of RTT
 	public static int repetitions=0;
+	
+	// number of concurrent simulated users used for computation of RTT
 	public static int count_users=0;
 	
+	// an array that contains server throughput (the amount of requests a server satisfies in a given interval(1000000 ns)) needed for each user
 	public static double throughput [] = new double [N];
+	
+	// number of repeated client-runs (to obtain more accurate results) used for computation of server throughput
 	public static int repet_throughput=0;
+	
+	// number of concurrent simulated users used for computation of server throughput 
 	public static int count_users_throughput=0;
 	
 	public static void main(String[] args) {
-		if (args.length < 2)
+		
+		// checks if the number of given arguments is correct
+		if (args.length < 3)
 			return;
+		
+		// initializes RTT array with 0
 		Arrays.fill(RTT, 0.0);
+		
+		// server's address
 		String hostname = args[0];
+		
+		// value of port
 		int port = Integer.parseInt(args[1]);
+		
+		// maximum number of repeated client-runs
 		int repet = Integer.parseInt(args[2]);
 
 		try {
+			// an array in which each created thread is saved
 			ArrayList<ClientThread> threads = new ArrayList<ClientThread>();
+			
+			//
 			for (int i = 1; i <= repet; i++) {
+				// the simulated user-id
 				int user_id = 1;
+				
 				count_users=0;
 				count_users_throughput=0;
 				while (user_id <= N) {
