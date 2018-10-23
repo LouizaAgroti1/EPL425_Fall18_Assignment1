@@ -1,6 +1,5 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,14 +8,21 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Scanner;
-import java.util.Arrays;
-import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Simulates a client as a thread. It sends a number of requests to the server 
+ * and reads the corresponding responses from the server. It writes to files
+ * the RTT and Throughput for 1 to N users.
+ */
 public class ClientThread extends Thread {
 
+	// the socket that the current user listens  
 	private Socket socket;
+	
+	// the user-id of the current user
 	private int user_id;
+	
+	
 	private int N;
 	private int repet;
 
